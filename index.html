@@ -1,0 +1,518 @@
+﻿```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Links & Bookmarks Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .smooth-transition {
+            transition: all 0.25s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white smooth-transition">
+
+
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-bookmark text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-tight">LinkHub</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Curated bookmarks & resources</p>
+                </div>
+            </div>
+
+
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition focus:outline-none" aria-label="Toggle theme">
+                    <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+                </button>
+                <button onclick="openAddModal()" class="inline-flex items-center space-x-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-brand-600 text-white shadow-md shadow-brand-600/20 hover:bg-brand-700 transition">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Add Link</span>
+                </button>
+                <button onclick="toggleEditGuide()" class="hidden sm:inline-flex items-center space-x-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 hover:bg-brand-500/20 transition">
+                    <i class="fa-solid fa-code"></i>
+                    <span>How to Edit</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Hero Section -->
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-3">
+                My Personal Hub
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400 text-sm sm:text-base mb-6">
+                Instant access to my favorite tools, reference articles, development guides, and daily reads.
+            </p>
+
+
+            <!-- Search Bar -->
+            <div class="relative max-w-xl mx-auto">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" id="search-input" placeholder="Search links by title, URL, or category..." 
+                    class="w-full pl-11 pr-10 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400 text-sm transition text-slate-900 dark:text-slate-100 placeholder-slate-400">
+                <button id="clear-search" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+
+        <div class="flex items-center justify-start sm:justify-center overflow-x-auto pb-4 mb-8 space-x-2 no-scrollbar" id="category-filters">
+            <button class="category-btn active px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-brand-600 text-white shadow-md shadow-brand-600/20 transition" data-category="all">
+                <i class="fa-solid fa-th-large mr-1.5"></i> All Links
+            </button>
+            <button class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-category="Tech & Dev">
+                <i class="fa-solid fa-code mr-1.5"></i> Tech & Dev
+            </button>
+            <button class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-category="Clinical & Medical">
+                <i class="fa-solid fa-stethoscope mr-1.5"></i> Clinical & Medical
+            </button>
+            <button class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-category="Productivity">
+                <i class="fa-solid fa-bolt mr-1.5"></i> Productivity
+            </button>
+            <button class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-category="Reading & Media">
+                <i class="fa-solid fa-book-open mr-1.5"></i> Reading & Media
+            </button>
+            <button class="category-btn px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-category="Design">
+                <i class="fa-solid fa-palette mr-1.5"></i> Design
+            </button>
+        </div>
+
+
+        <div id="links-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            <!-- Cards will be injected dynamically via JavaScript based on link items array -->
+        </div>
+
+
+        <div id="edit-guide" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 mb-12 shadow-sm transition">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">How to Edit or Save Your Links Permanently</h3>
+                </div>
+                <button onclick="toggleEditGuide()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                You can now add links directly using the <strong>"+ Add Link"</strong> button above! Your added links will be saved in your browser's local storage. To make your changes permanent across devices or share them on GitHub, you can also modify the <code class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-brand-600 dark:text-brand-400 font-mono text-xs">linksData</code> array in the code.
+            </p>
+            <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 font-mono text-xs text-slate-700 dark:text-slate-300 overflow-x-auto">
+                <pre>{
+  title: "GitHub",
+  url: "https://github.com",
+  category: "Tech & Dev",
+  description: "Where I host all my code repositories and projects.",
+  icon: "fa-brands fa-github"
+}</pre>
+            </div>
+        </div>
+
+
+    </main>
+
+
+    <!-- Add Link Modal -->
+    <div id="add-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl transition transform">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-plus text-brand-600"></i>
+                    <span>Add New Link</span>
+                </h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form id="add-link-form" onsubmit="handleAddNewLink(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Link Title *</label>
+                    <input type="text" id="new-title" required placeholder="E.g., Stack Overflow" 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">URL (Website Address) *</label>
+                    <input type="url" id="new-url" required placeholder="https://stackoverflow.com" 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Category *</label>
+                    <select id="new-category" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-slate-100">
+                        <option value="Tech & Dev">Tech & Dev</option>
+                        <option value="Clinical & Medical">Clinical & Medical</option>
+                        <option value="Productivity">Productivity</option>
+                        <option value="Reading & Media">Reading & Media</option>
+                        <option value="Design">Design</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Description</label>
+                    <textarea id="new-description" rows="2" placeholder="Brief summary of what this link is..." 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-slate-100"></textarea>
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeAddModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white shadow-md shadow-brand-600/20 hover:bg-brand-700 transition">
+                        Save Link
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <footer class="border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-900/50">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>&copy; 2026 LinkHub. Created with a single HTML file.</p>
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleEditGuide()" class="hover:text-brand-600 dark:hover:text-brand-400 transition sm:hidden">How to Edit</button>
+                <span>•</span>
+                <span id="link-count" class="font-medium">0 links loaded</span>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        // Data source containing all links
+        const defaultLinksData = [
+            {
+                title: "GitHub",
+                url: "https://github.com",
+                category: "Tech & Dev",
+                description: "Primary repository hosting platform for all open-source work and coding projects.",
+                icon: "fa-brands fa-github"
+            },
+            {
+                title: "MDN Web Docs",
+                url: "https://developer.mozilla.org",
+                category: "Tech & Dev",
+                description: "Comprehensive technical reference for HTML, CSS, and modern JavaScript.",
+                icon: "fa-solid fa-book"
+            },
+            {
+                title: "PubMed Central",
+                url: "https://pubmed.ncbi.nlm.nih.gov",
+                category: "Clinical & Medical",
+                description: "Free full-text archive of biomedical and life sciences journal literature.",
+                icon: "fa-solid fa-stethoscope"
+            },
+            {
+                title: "NEJM Journal",
+                url: "https://www.nejm.org",
+                category: "Clinical & Medical",
+                description: "Leading peer-reviewed medical journal and clinical practice resource.",
+                icon: "fa-solid fa-heart-pulse"
+            },
+            {
+                title: "Notion",
+                url: "https://www.notion.so",
+                category: "Productivity",
+                description: "All-in-one workspace for note-taking, task management, and project roadmaps.",
+                icon: "fa-solid fa-note-sticky"
+            },
+            {
+                title: "Tailwind CSS UI",
+                url: "https://tailwindcss.com",
+                category: "Design",
+                description: "Utility-first CSS framework for rapidly building modern custom user interfaces.",
+                icon: "fa-solid fa-paintbrush"
+            },
+            {
+                title: "Hacker News",
+                url: "https://news.ycombinator.com",
+                category: "Reading & Media",
+                description: "Social news website focusing on computer science, tech entrepreneurship, and innovation.",
+                icon: "fa-solid fa-globe"
+            },
+            {
+                title: "Figma",
+                url: "https://www.figma.com",
+                category: "Design",
+                description: "Collaborative interface design tool for wireframing, prototyping, and UI design.",
+                icon: "fa-solid fa-pen-nib"
+            },
+            {
+                title: "ChatGPT",
+                url: "https://chatgpt.com",
+                category: "Productivity",
+                description: "AI conversational assistant for brainstorming, coding support, and summarizing texts.",
+                icon: "fa-solid fa-robot"
+            }
+        ];
+
+
+        // Load links from local storage if available, otherwise default
+        let linksData = JSON.parse(localStorage.getItem('my_custom_links')) || defaultLinksData;
+
+
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+
+        // DOM elements
+        const linksContainer = document.getElementById('links-container');
+        const searchInput = document.getElementById('search-input');
+        const clearSearchBtn = document.getElementById('clear-search');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const linkCountEl = document.getElementById('link-count');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const editGuideEl = document.getElementById('edit-guide');
+        const addModal = document.getElementById('add-modal');
+
+
+        // Render links based on active filter and search query
+        function renderLinks() {
+            const filtered = linksData.filter(link => {
+                const matchesCategory = currentCategory === 'all' || link.category.toLowerCase() === currentCategory.toLowerCase();
+                const query = searchQuery.toLowerCase();
+                const matchesSearch = link.title.toLowerCase().includes(query) || 
+                                      link.description.toLowerCase().includes(query) || 
+                                      link.category.toLowerCase().includes(query) ||
+                                      link.url.toLowerCase().includes(query);
+                return matchesCategory && matchesSearch;
+            });
+
+
+            linkCountEl.textContent = `${filtered.length} link${filtered.length === 1 ? '' : 's'} displayed`;
+
+
+            linksContainer.innerHTML = filtered.map((link, index) => {
+                // Find original index in full linksData array for editing/deleting
+                const originalIndex = linksData.findIndex(l => l.url === link.url && l.title === link.title);
+                return `
+                <div class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-brand-500/50 dark:hover:border-brand-500/50 transition duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-base group-hover:scale-110 transition duration-200">
+                                <i class="${link.icon || 'fa-solid fa-link'}"></i>
+                            </div>
+                            <div class="flex items-center space-x-1.5">
+                                <span class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                    ${link.category}
+                                </span>
+                                <!-- Edit & Delete buttons -->
+                                <button onclick="openEditModal(${originalIndex})" title="Edit Link" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-pen text-[10px]"></i>
+                                </button>
+                                <button onclick="deleteLink(${originalIndex})" title="Delete Link" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-red-600 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-trash text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base text-slate-900 dark:text-white mb-1.5 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
+                            ${link.title}
+                        </h3>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4 line-clamp-2">
+                            ${link.description}
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span class="text-[11px] font-mono text-slate-400 truncate max-w-[170px]" title="${link.url}">
+                            ${link.url.replace(/^https?:\/\//, '')}
+                        </span>
+                        <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition">
+                            <span>Visit</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+
+        // Search event listener
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim();
+            if (searchQuery.length > 0) {
+                clearSearchBtn.classList.remove('hidden');
+            } else {
+                clearSearchBtn.classList.add('hidden');
+            }
+            renderLinks();
+        });
+
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.classList.add('hidden');
+            renderLinks();
+            searchInput.focus();
+        });
+
+
+        // Category filter button listeners
+        categoryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryButtons.forEach(b => {
+                    b.classList.remove('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-600/20');
+                    b.classList.add('bg-white', 'dark:bg-slate-900', 'text-slate-600', 'dark:text-slate-300', 'border', 'border-slate-200', 'dark:border-slate-800');
+                });
+                btn.classList.add('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-600/20');
+                btn.classList.remove('bg-white', 'dark:bg-slate-900', 'text-slate-600', 'dark:text-slate-300', 'border', 'border-slate-200', 'dark:border-slate-800');
+                
+                currentCategory = btn.getAttribute('data-category');
+                renderLinks();
+            });
+        });
+
+
+        // Dark/Light mode toggle
+        themeToggleBtn.addEventListener('click', () => {
+            const htmlEl = document.documentElement;
+            if (htmlEl.classList.contains('dark')) {
+                htmlEl.classList.remove('dark');
+                themeIcon.className = 'fa-solid fa-sun text-sm';
+            } else {
+                htmlEl.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-moon text-sm';
+            }
+        });
+
+
+        // Toggle edit guide visibility
+        function toggleEditGuide() {
+            editGuideEl.classList.toggle('hidden');
+            if (!editGuideEl.classList.contains('hidden')) {
+                editGuideEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+
+        // Modal Controls
+        let editingIndex = -1;
+
+
+        function openAddModal() {
+            editingIndex = -1;
+            document.getElementById('modal-title').textContent = 'Add New Link';
+            document.getElementById('submit-btn-text').textContent = 'Save Link';
+            document.getElementById('add-link-form').reset();
+            addModal.classList.remove('hidden');
+        }
+
+
+        function openEditModal(index) {
+            editingIndex = index;
+            const link = linksData[index];
+            document.getElementById('modal-title').textContent = 'Edit Link';
+            document.getElementById('submit-btn-text').textContent = 'Update Link';
+            
+            document.getElementById('new-title').value = link.title;
+            document.getElementById('new-url').value = link.url;
+            document.getElementById('new-category').value = link.category;
+            document.getElementById('new-description').value = link.description === 'No description provided.' ? '' : link.description;
+            
+            addModal.classList.remove('hidden');
+        }
+
+
+        function closeAddModal() {
+            addModal.classList.add('hidden');
+            document.getElementById('add-link-form').reset();
+            editingIndex = -1;
+        }
+
+
+        // Handle adding or updating a link from UI
+        function handleAddNewLink(e) {
+            e.preventDefault();
+            const title = document.getElementById('new-title').value.trim();
+            const url = document.getElementById('new-url').value.trim();
+            const category = document.getElementById('new-category').value;
+            const description = document.getElementById('new-description').value.trim() || 'No description provided.';
+
+
+            // Pick icon based on category
+            let icon = 'fa-solid fa-link';
+            if (category === 'Tech & Dev') icon = 'fa-solid fa-code';
+            else if (category === 'Clinical & Medical') icon = 'fa-solid fa-stethoscope';
+            else if (category === 'Productivity') icon = 'fa-solid fa-bolt';
+            else if (category === 'Reading & Media') icon = 'fa-solid fa-book-open';
+            else if (category === 'Design') icon = 'fa-solid fa-palette';
+
+
+            if (editingIndex > -1) {
+                // Update existing link
+                linksData[editingIndex] = { ...linksData[editingIndex], title, url, category, description, icon };
+            } else {
+                // Add new link
+                const newLink = { title, url, category, description, icon };
+                linksData.unshift(newLink);
+            }
+
+
+            // Save to localStorage
+            localStorage.setItem('my_custom_links', JSON.stringify(linksData));
+
+
+            closeAddModal();
+            renderLinks();
+        }
+
+
+        // Delete link function
+        function deleteLink(index) {
+            if (confirm("Are you sure you want to delete this link?")) {
+                linksData.splice(index, 1);
+                localStorage.setItem('my_custom_links', JSON.stringify(linksData));
+                renderLinks();
+            }
+        }
+
+
+        // Initial render on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderLinks();
+        });
+    </script>
+</body>
+</html>
+```
